@@ -7,7 +7,6 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.sql.SQLException;
 import java.util.List;
 
 public class EmployeeManagementPanel extends JPanel {
@@ -100,8 +99,6 @@ public class EmployeeManagementPanel extends JPanel {
             refreshAfterMutation();
         } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Validation Error", JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Failed to add employee: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -116,8 +113,6 @@ public class EmployeeManagementPanel extends JPanel {
             refreshAfterMutation();
         } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Validation Error", JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Failed to update employee: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -135,8 +130,6 @@ public class EmployeeManagementPanel extends JPanel {
             refreshAfterMutation();
         } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Validation Error", JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Failed to delete employee: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -174,20 +167,16 @@ public class EmployeeManagementPanel extends JPanel {
     private void loadEmployees(String keyword) {
         tableModel.setRowCount(0);
         String department = (String) departmentFilter.getSelectedItem();
-        try {
-            List<Employee> employees = payrollManager.searchEmployees(keyword, department);
-            for (Employee employee : employees) {
-                tableModel.addRow(new Object[]{
-                        employee.getId(),
-                        employee.getEmployeeId(),
-                        employee.getName(),
-                        employee.getDepartment(),
-                        employee.getDesignation(),
-                        employee.getBaseSalary()
-                });
-            }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Failed to load employees: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+        List<Employee> employees = payrollManager.searchEmployees(keyword, department);
+        for (Employee employee : employees) {
+            tableModel.addRow(new Object[]{
+                    employee.getId(),
+                    employee.getEmployeeId(),
+                    employee.getName(),
+                    employee.getDepartment(),
+                    employee.getDesignation(),
+                    employee.getBaseSalary()
+            });
         }
     }
 
@@ -195,12 +184,8 @@ public class EmployeeManagementPanel extends JPanel {
         String previous = (String) departmentFilter.getSelectedItem();
         departmentFilter.removeAllItems();
         departmentFilter.addItem("All");
-        try {
-            for (String department : payrollManager.getDepartments()) {
-                departmentFilter.addItem(department);
-            }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Failed to load departments: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+        for (String department : payrollManager.getDepartments()) {
+            departmentFilter.addItem(department);
         }
         if (previous != null) {
             departmentFilter.setSelectedItem(previous);

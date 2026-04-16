@@ -6,7 +6,6 @@ import com.payroll.model.PayrollRecord;
 
 import javax.swing.*;
 import java.awt.*;
-import java.sql.SQLException;
 import java.util.List;
 
 public class PayrollPanel extends JPanel {
@@ -43,13 +42,9 @@ public class PayrollPanel extends JPanel {
 
     public void refreshEmployees() {
         employeeComboBox.removeAllItems();
-        try {
-            List<Employee> employees = payrollManager.getAllEmployees();
-            for (Employee employee : employees) {
-                employeeComboBox.addItem(employee);
-            }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Failed to load employees: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+        List<Employee> employees = payrollManager.getAllEmployees();
+        for (Employee employee : employees) {
+            employeeComboBox.addItem(employee);
         }
     }
 
@@ -57,6 +52,9 @@ public class PayrollPanel extends JPanel {
         Employee employee = (Employee) employeeComboBox.getSelectedItem();
         try {
             double taxRate = Double.parseDouble(taxField.getText().trim());
+            if (employee == null) {
+                throw new IllegalArgumentException("Please select an employee");
+            }
             PayrollRecord record = payrollManager.createPayrollRecord(employee, taxRate);
             resultLabel.setText(String.format("Net pay for %s: %.2f", record.getEmployeeName(), record.getNetPay()));
             payslipPanel.showPayslip(record);
@@ -66,8 +64,6 @@ public class PayrollPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Tax deduction must be numeric", "Validation Error", JOptionPane.ERROR_MESSAGE);
         } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Validation Error", JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Failed to save payroll: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

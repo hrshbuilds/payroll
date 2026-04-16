@@ -4,7 +4,6 @@ import com.payroll.db.DatabaseHelper;
 import com.payroll.model.Employee;
 import com.payroll.model.PayrollRecord;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class PayrollManager {
@@ -14,37 +13,37 @@ public class PayrollManager {
         this.databaseHelper = databaseHelper;
     }
 
-    public Employee addEmployee(Employee employee) throws SQLException {
+    public Employee addEmployee(Employee employee) {
         validateEmployee(employee, false);
         int id = databaseHelper.addEmployee(employee);
         employee.setId(id);
         return employee;
     }
 
-    public void updateEmployee(Employee employee) throws SQLException {
+    public void updateEmployee(Employee employee) {
         validateEmployee(employee, true);
         databaseHelper.updateEmployee(employee);
     }
 
-    public void deleteEmployee(int employeeDbId) throws SQLException {
+    public void deleteEmployee(int employeeDbId) {
         databaseHelper.deleteEmployee(employeeDbId);
     }
 
-    public List<Employee> getAllEmployees() throws SQLException {
+    public List<Employee> getAllEmployees() {
         return databaseHelper.getAllEmployees();
     }
 
-    public List<Employee> searchEmployees(String keyword, String department) throws SQLException {
+    public List<Employee> searchEmployees(String keyword, String department) {
         String safeKeyword = keyword == null ? "" : keyword.trim();
         String safeDepartment = (department == null || department.isBlank()) ? "All" : department;
         return databaseHelper.searchEmployees(safeKeyword, safeDepartment);
     }
 
-    public List<String> getDepartments() throws SQLException {
+    public List<String> getDepartments() {
         return databaseHelper.getDepartments();
     }
 
-    public PayrollRecord createPayrollRecord(Employee employee, double taxRatePercent) throws SQLException {
+    public PayrollRecord createPayrollRecord(Employee employee, double taxRatePercent) {
         if (employee == null || employee.getId() == null) {
             throw new IllegalArgumentException("Please select a valid employee");
         }
@@ -57,7 +56,7 @@ public class PayrollManager {
         return record;
     }
 
-    public List<PayrollRecord> getPayrollReportByMonth(String month) throws SQLException {
+    public List<PayrollRecord> getPayrollReportByMonth(String month) {
         if (month == null || !month.matches("\\d{4}-\\d{2}")) {
             throw new IllegalArgumentException("Month must be in YYYY-MM format");
         }
